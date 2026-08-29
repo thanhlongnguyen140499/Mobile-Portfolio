@@ -1,1 +1,87 @@
 @import "tailwindcss";
+
+@theme {
+  /* ---- surface ---- */
+  --color-ink: #08090b;
+  --color-ink-raised: #0e1014;
+  --color-ink-sunken: #050608;
+  --color-line: #ffffff14;
+  --color-line-strong: #ffffff2e;
+
+  /* ---- type ---- */
+  --color-bone: #edeef0;
+  --color-muted: #8a8f98;
+  --color-faint: #5a5f68;
+
+  /* ---- accents (one per featured project) ---- */
+  --color-accent: #4cc9f0;
+  --color-wispr: #3ba9d4;
+  --color-news: #e0a13a;
+  --color-fitness: #4ec98a;
+
+  /* ---- fonts (wired to next/font in layout.tsx) ---- */
+  --font-display: var(--font-bricolage), ui-serif, Georgia, serif;
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+
+  /* ---- rhythm ---- */
+  --spacing-section: 9rem;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  html {
+    background-color: var(--color-ink);
+    color-scheme: dark;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-bone);
+    font-family: var(--font-sans);
+    /* Lenis drives scrolling; keep native smooth scroll off to avoid fighting it. */
+    scroll-behavior: auto;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Tabular figures everywhere metadata lives, so dates and counts don't jitter. */
+  .font-mono,
+  [class*="font-mono"] {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+}
+
+/* Motion is opt-out at the CSS level as well as in JS, so nothing animates for
+   visitors who asked it not to — including anything Framer Motion drives. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "slug": "wispr-network",
+  "trackName": "Wispr Network",
+  "sellerName": "HomeWayz, Inc.",
+  "genre": "Utilities",
+  "version": "1.2.13",
+  "minimumOsVersion": "15.1",
+  "releaseDate": "2024-04-26T07:00:00Z",
+  "currentVersionReleaseDate": "2026-07-24T17:31:32Z",
+  "averageUserRating": 5,
+  "userRatingCount": 1,
+  "screens": 5,
+  "screenAspect": 0.5625,
+  "screenKind": "capture",
+  "storefront": "us",
+  "fetchedAt": "2026-08-28T04:31:38.185Z"
+}

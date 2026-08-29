@@ -1,0 +1,17 @@
+{
+  "slug": "philadelphia-inquirer",
+  "trackName": "The Philadelphia Inquirer",
+  "sellerName": "Philadelphia Media Network (Digital), LLC",
+  "genre": "News",
+  "version": "28.4.1",
+  "minimumOsVersion": "16.0",
+  "releaseDate": "2012-11-14T22:15:18Z",
+  "currentVersionReleaseDate": "2026-07-22T20:02:10Z",
+  "averageUserRating": 4.60393,
+  "userRatingCount": 17982,
+  "screens": 5,
+  "screenAspect": 0.4615,
+  "screenKind": "capture",
+  "storefront": "us",
+  "fetchedAt": "2026-08-28T04:31:40.520Z"
+}
