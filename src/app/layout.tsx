@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
 import { profile } from "@/data/profile";
 import { site } from "@/lib/site";
@@ -129,6 +130,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         </a>
         {children}
         <PersonJsonLd />
+        <Analytics />
       </body>
     </html>
   );
