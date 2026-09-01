@@ -96,6 +96,8 @@ export function Device({
     cycleNext: 0,
     mixing: false,
     timer: index * 1.1, // stagger so the three devices don't flip in unison
+    /** 0 → 1 over the first few frames the device is on screen. */
+    appear: 0,
   });
 
   useFrame((state, dt) => {
@@ -212,7 +214,16 @@ export function Device({
     ry = THREE.MathUtils.lerp(ry, 0, square);
     rz = THREE.MathUtils.lerp(rz, 0, square);
     z += a2.hover * 70;
-    material.uniforms.uBrightness.value = 1 + a2.hover * 0.14;
+
+    /* --- arrival --------------------------------------------------------
+     * The CSS device frame underneath is cross-fading out over 700ms
+     * (DeviceSlot), and a WebGL device that snaps in at full size and full
+     * brightness halfway through that fade reads as a glitch. Coming up
+     * slightly small and dark instead makes the handoff look like the screen
+     * waking, which is what it is. */
+    a2.appear = damp(a2.appear, 1, 3.6, delta);
+    scale *= 0.94 + a2.appear * 0.06;
+    material.uniforms.uBrightness.value = (1 + a2.hover * 0.14) * (0.2 + a2.appear * 0.8);
 
     // Position is set, not damped: the device is pinned to a DOM box, and
     // easing toward it would let it drift behind the layout while scrolling.

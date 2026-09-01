@@ -5,6 +5,12 @@ import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { publishScroll } from "@/lib/scroll";
 import { prefersReducedMotion } from "@/lib/tier";
+import { useIntroStore } from "@/lib/intro-store";
+
+/** Whether the arrival overlay still owns the viewport. */
+function introHolding() {
+  return useIntroStore.getState().phase !== "done";
+}
 
 /**
  * Drives page scrolling and publishes scroll state for the 3D scene.
@@ -47,15 +53,35 @@ export function SmoothScroll() {
         return;
       }
       lenis.scrollTo(window.scrollY, { immediate: true, force: true });
-      lenis.start();
+      // Not while the intro is holding the viewport — see the effect below.
+      if (!introHolding()) lenis.start();
     };
     frame = requestAnimationFrame(settle);
 
     return () => {
       cancelAnimationFrame(frame);
-      lenis.start();
+      if (!introHolding()) lenis.start();
     };
   }, [pathname]);
+
+  /*
+   * Hold the scroller while the arrival overlay is up.
+   *
+   * `overflow: hidden` alone doesn't cover this: Lenis drives scrolling from
+   * its own rAF and would keep writing positions behind an opaque overlay. The
+   * device flight in scene/Device.tsx is scroll-position-driven, so any motion
+   * during the load spends the animation before anyone can see it.
+   */
+  useEffect(
+    () =>
+      useIntroStore.subscribe((state) => {
+        const lenis = lenisRef.current;
+        if (!lenis) return;
+        if (state.phase === "done") lenis.start();
+        else lenis.stop();
+      }),
+    [],
+  );
 
   useEffect(() => {
     const reduced = prefersReducedMotion();
@@ -90,6 +116,10 @@ export function SmoothScroll() {
       stopInertiaOnNavigate: true,
     });
     lenisRef.current = lenis;
+    // Mounted mid-intro on a cold load: start held, and let the subscription
+    // above release it. Lenis is constructed after <Preloader> has already set
+    // the phase, so reading it once here is enough.
+    if (introHolding()) lenis.stop();
 
     lenis.on("scroll", ({ scroll, progress, velocity }) => {
       publishScroll({ y: scroll, progress, velocity });

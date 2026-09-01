@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { profile } from "@/data/profile";
 import { HeroAnchor } from "@/components/HeroAnchor";
 
@@ -20,21 +21,33 @@ export function Hero() {
         {/* Text is held to the left of the device cluster rather than centred
             under it — the two share the viewport, so neither can run wide. */}
         <div className="md:max-w-[58%]">
-          <p className="text-faint mb-8 font-mono text-[0.7rem] tracking-[0.22em] uppercase">
+          <p
+            className="text-faint intro-rise mb-8 font-mono text-[0.7rem] tracking-[0.22em] uppercase"
+            style={{ "--intro-delay": "0.05s" } as CSSProperties}
+          >
             {profile.location}
             <span className="text-line-strong mx-3">/</span>
             {profile.relocation.note}
           </p>
 
-          <h1 className="font-display text-balance text-[clamp(2.5rem,6.2vw,5.5rem)] leading-[0.95] font-semibold tracking-[-0.035em]">
+          <h1
+            className="font-display intro-rise text-balance text-[clamp(2.5rem,6.2vw,5.5rem)] leading-[0.95] font-semibold tracking-[-0.035em]"
+            style={{ "--intro-delay": "0.14s" } as CSSProperties}
+          >
             {profile.name}
           </h1>
 
-          <p className="text-muted mt-8 max-w-xl text-pretty text-[clamp(1rem,1.5vw,1.15rem)] leading-relaxed">
+          <p
+            className="text-muted intro-rise mt-8 max-w-xl text-pretty text-[clamp(1rem,1.5vw,1.15rem)] leading-relaxed"
+            style={{ "--intro-delay": "0.26s" } as CSSProperties}
+          >
             {profile.intro}
           </p>
 
-          <div className="mt-9 flex flex-wrap items-center gap-3">
+          <div
+            className="intro-rise mt-9 flex flex-wrap items-center gap-3"
+            style={{ "--intro-delay": "0.36s" } as CSSProperties}
+          >
             <a
               href="#work"
               className="bg-bone text-ink rounded-full px-6 py-3 text-sm font-medium transition-transform duration-300 hover:-translate-y-0.5"
@@ -50,7 +63,10 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="border-line mt-14 grid grid-cols-2 gap-y-6 border-t pt-8 md:mt-16 md:grid-cols-4">
+        <div
+          className="border-line intro-rise mt-14 grid grid-cols-2 gap-y-6 border-t pt-8 md:mt-16 md:grid-cols-4"
+          style={{ "--intro-delay": "0.46s" } as CSSProperties}
+        >
           {STATS.map((s) => (
             <div key={s.l}>
               <div className="font-display text-bone text-2xl font-medium tracking-tight md:text-3xl">

@@ -4,6 +4,7 @@ import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
 import { profile } from "@/data/profile";
 import { site } from "@/lib/site";
 import { SmoothScroll } from "@/components/SmoothScroll";
+import { Preloader } from "@/components/intro/Preloader";
 import { SceneRoot } from "@/components/scene/SceneRoot";
 import { getDeviceSpecs } from "@/lib/devices";
 import "./globals.css";
@@ -71,6 +72,22 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
+/*
+ * Runs during HTML parsing, before the first paint — which is the whole point.
+ *
+ * The device flight in scene/Device.tsx is driven by scroll position, so a
+ * visitor who flicks the trackpad while the WebGL chunk is still downloading
+ * has already scrubbed past the animation's entire input range before it can
+ * play. Marking <html> here puts the CSS scroll hold in globals.css into force
+ * immediately, rather than whenever the bundle finishes hydrating — by which
+ * time the page could already have moved.
+ *
+ * <Preloader> takes ownership of the attribute once it mounts. The timeout is
+ * the escape hatch for the case it never does (a chunk that 404s, a hydration
+ * crash): a visitor must never be left holding a page that won't scroll.
+ */
+const INTRO_BOOTSTRAP = `(function(){try{var e=document.documentElement;e.dataset.intro="loading";setTimeout(function(){if(e.dataset.intro==="loading"){delete e.dataset.intro;var n=document.getElementById("intro");if(n)n.style.display="none"}},8000)}catch(_){}})()`;
+
 /**
  * Person schema so a recruiter searching the name gets a rich result, and so
  * the CV name and the working name are explicitly linked.
@@ -119,7 +136,23 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${display.variable} ${sans.variable} ${mono.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        <script
+          /* text/plain on the client so React doesn't warn about a rendered
+             <script>; it only ever needs to execute on a hard load anyway. */
+          type={typeof window === "undefined" ? "text/javascript" : "text/plain"}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: INTRO_BOOTSTRAP }}
+        />
+        {/* Without JS the attribute above is never set, so the scroll hold and
+            the entrance transitions are already inert — but the overlay is
+            server-rendered markup and would sit there forever. */}
+        <noscript>
+          <style>{`#intro{display:none!important}`}</style>
+        </noscript>
+      </head>
       <body className="bg-ink text-bone antialiased">
+        <Preloader />
         <SmoothScroll />
         <SceneRoot devices={devices} />
         <a

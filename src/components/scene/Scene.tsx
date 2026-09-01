@@ -11,6 +11,7 @@ import { createMockCanvas, MOCK_BY_SLUG } from "@/lib/mock-screen";
 import { prepareScreenTexture } from "@/lib/screen-material";
 import { hasSlots, onSlotsChanged } from "@/lib/device-slots";
 import { useSceneStore } from "@/lib/scene-store";
+import { useIntroStore } from "@/lib/intro-store";
 import type { Tier } from "@/lib/tier";
 
 export type DeviceSpec = {
@@ -64,6 +65,10 @@ function FrameloopGuard() {
     const update = () => {
       const live = hasSlots() && !document.hidden;
       setFrameloop(live ? "always" : "never");
+      /* Nothing will draw on a route with no devices, so <ReadySignal> can't
+         fire — tell the arrival overlay the scene is as ready as it gets
+         rather than leaving it to time out. */
+      if (!hasSlots()) useIntroStore.getState().mark("sceneReady");
       // Parking the loop freezes whatever was drawn last, so a case study
       // would keep the home page's devices painted behind it. Clear once the
       // loop has actually stopped.
@@ -94,7 +99,12 @@ function ReadySignal() {
   const setActive = useSceneStore((s) => s.setActive);
 
   useFrame(() => {
-    if (!useSceneStore.getState().active) setActive(true);
+    if (!useSceneStore.getState().active) {
+      setActive(true);
+      // The arrival overlay waits on this: it should lift onto devices that
+      // are already drawn, not onto the CSS frames mid-crossfade.
+      useIntroStore.getState().mark("sceneReady");
+    }
   });
 
   useEffect(() => () => useSceneStore.getState().setActive(false), []);

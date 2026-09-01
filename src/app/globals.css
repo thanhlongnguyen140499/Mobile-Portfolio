@@ -31,6 +31,11 @@
 
 @layer base {
   html {
+    /* Reserved unconditionally so the intro's `overflow: hidden` can't reclaim
+       a classic scrollbar's width mid-load. The 3D devices are positioned from
+       DOM rects, so a few pixels of width change during the hold would move
+       them, and they'd visibly jump back when the overlay lifts. */
+    scrollbar-gutter: stable;
     background-color: var(--color-ink);
     color-scheme: dark;
     -webkit-font-smoothing: antialiased;
@@ -83,5 +88,44 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Arrival sequence.
+
+   `data-intro` is put on <html> by an inline script in <head> (see layout.tsx)
+   and then owned by <Preloader>. It is set during HTML parsing, before the
+   first paint, which is the point: the scroll hold has to be in force in the
+   window between the HTML arriving and React hydrating — exactly the window in
+   which a visitor flicks the trackpad and skips the device flight.
+
+   Because the attribute only ever exists when the script ran, every rule here
+   is inert without JS, and the page renders as it always did.
+--------------------------------------------------------------------------- */
+
+html[data-intro="loading"],
+html[data-intro="loading"] body,
+html[data-intro="opening"],
+html[data-intro="opening"] body {
+  overflow: hidden;
+}
+
+@layer utilities {
+  /* Hero elements hold below their resting position until the overlay lifts,
+     so the page arrives rather than being revealed already settled. Stagger
+     with --intro-delay per element. */
+  .intro-rise {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+
+  html[data-intro="opening"] .intro-rise,
+  html[data-intro="done"] .intro-rise {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.9s var(--ease-out-expo) var(--intro-delay, 0s),
+      transform 0.9s var(--ease-out-expo) var(--intro-delay, 0s);
   }
 }
