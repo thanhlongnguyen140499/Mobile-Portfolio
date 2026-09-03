@@ -3,10 +3,17 @@ import { profile } from "@/data/profile";
 /**
  * Set NEXT_PUBLIC_SITE_URL in the deploy environment (Vercel: Project →
  * Settings → Environment Variables) so canonical URLs and OG images resolve
- * absolutely. The fallback keeps local builds working.
+ * absolutely — set it to the custom domain once there is one.
+ *
+ * Without it we fall back to the Vercel project's production URL, which Vercel
+ * injects automatically, so a deploy never ships localhost canonicals or OG
+ * image URLs. Local builds fall back to localhost.
  */
+const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL;
+
 export const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (vercelUrl ? `https://${vercelUrl}` : "http://localhost:3000")
 ).replace(/\/$/, "");
 
 export const site = {
